@@ -104,6 +104,7 @@ This final log line means that the process exited normally. Your final `call Exi
 
 extrn  GetStdHandle  :PROC
 extrn  WriteConsoleA :PROC
+extrn  ExitProcess   :PROC
 
 .data
        msgText      db "Hello World", 0Ah, 0 
@@ -136,8 +137,12 @@ mainCRTStartup PROC
   MOV    RCX, RAX                 ; 1st param = hConsoleOutput
   CALL   WriteConsoleA            ; call Win32 API
 
-  ADD   RSP, 28h                  ; restore 32-byte shadow space, +8 16-b align
-  ret                             ; return to caller
+  ; void ExitProcess(
+  ;   [in] UINT uExitCode
+  ; );
+  MOV    RCX, 0                   ; 1st param = uExitCode
+  CALL   ExitProcess              ; call Win32 API
+
 mainCRTStartup ENDP
 
 END
