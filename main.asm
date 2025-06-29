@@ -50,6 +50,8 @@ mainCRTStartup PROC
   MOV    RCX, 0                   ; 1st param = uExitCode
   CALL   ExitProcess              ; call Win32 API
 
+  ADD    RSP, 28h                 ; restore 32-byte shadow space, +8 16-b align 
+  RET                             ; return to caller
 mainCRTStartup ENDP
 
 END
