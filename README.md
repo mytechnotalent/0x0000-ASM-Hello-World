@@ -14,6 +14,8 @@
 #### [SLIDES](https://mrexodia.github.io/files/wicc-2023-slides.pdf)
 #### [VIDEO](https://youtu.be/I_nJltUokE0?si=Q1yOfZuIF5jOa_2U)
 
+<br>
+
 ## Reverse Engineering
 ```
 CTRL-G ntdll.LdrInitializeThunk & cal <ntdll.NtContinue>
