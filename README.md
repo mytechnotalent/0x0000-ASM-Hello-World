@@ -58,20 +58,7 @@ It checks the global flag:
 
 > This is where the environment gets fully fleshed out.
 
-#### 5. 🛡️ EDR Hooks: `ntdll!ZwTestAlert()`
-
-At the end of `LdrpInitialize()`:
-
-- It calls `ntdll!ZwTestAlert()`
-
-This checks for any *queued APCs* (Asynchronous Procedure Calls).  
-EDRs using kernel drivers may queue an APC via:
-
-- `ntoskrnl!NtQueueApcThread()`
-
-> If there’s EDR code in the APC queue, it runs *right here*, before the user’s code ever executes.
-
-#### 6. 🏁 Launching the Process: `ZwContinue()` and Beyond
+#### 5. 🏁 Launching the Process: `ZwContinue()` and Beyond
 
 When initialization is done:
 
