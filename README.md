@@ -20,7 +20,7 @@
 
 ### 🧠 Windows Process Loader: Beginner-Friendly Breakdown
 
-To understand when and how DLLs load, let’s walk through what actually happens when a Windows process is created.
+Let’s walk through what actually happens when a Windows process is created.
 
 #### 1. 🧱 Process Creation by the Kernel
 
@@ -67,6 +67,7 @@ When initialization is done:
 3. Finally, the process’s *entrypoint function* is called
 
 > Now the executable starts for real.
+
 <br>
 
 ## Code
