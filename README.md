@@ -17,6 +17,70 @@
 <br>
 
 ## Reverse Engineering
+
+### 🧠 Windows Process Loader: Beginner-Friendly Breakdown
+
+To understand when and how EDR (Endpoint Detection and Response) DLLs can load, let’s walk through what actually happens when a Windows process is created.
+
+#### 1. 🧱 Process Creation by the Kernel
+
+When a new process is spun up, the kernel:
+
+- Maps the target *executable image* into memory  
+- Loads *ntdll.dll*  
+- Creates a *new thread* to eventually run the main function  
+
+> At this point, the process has no initialized PEB, TEB, or imports — it’s just a shell.
+
+#### 2. 🚀 Starting the Thread: `ntdll!LdrInitializeThunk()`
+
+This function is always the initial thread entrypoint. It immediately calls:
+
+- `ntdll!LdrpInitialize()` – this handles setup.
+
+#### 3. 🏗️ Initialization via `ntdll!LdrpInitialize()`
+
+This routine does two things:
+
+- Sets up the *process* if it's not already initialized  
+- Sets up the *current thread*
+
+It checks the global flag:
+
+- `ntdll!LdrpProcessInitialized`  
+  - If `FALSE`, it calls `ntdll!LdrpInitializeProcess()`
+
+#### 4. 🔧 What `LdrpInitializeProcess()` Does
+
+- Initializes the *PEB*  
+- Resolves the process’s *import table*  
+- Loads any *required DLLs*
+
+> This is where the environment gets fully fleshed out.
+
+#### 5. 🛡️ EDR Hooks: `ntdll!ZwTestAlert()`
+
+At the end of `LdrpInitialize()`:
+
+- It calls `ntdll!ZwTestAlert()`
+
+This checks for any *queued APCs* (Asynchronous Procedure Calls).  
+EDRs using kernel drivers may queue an APC via:
+
+- `ntoskrnl!NtQueueApcThread()`
+
+> If there’s EDR code in the APC queue, it runs *right here*, before the user’s code ever executes.
+
+#### 6. 🏁 Launching the Process: `ZwContinue()` and Beyond
+
+When initialization is done:
+
+1. `LdrInitializeThunk()` calls `ZwContinue()`  
+2. The kernel sets the instruction pointer to `ntdll!RtlUserThreadStart()`  
+3. Finally, the process’s *entrypoint function* is called
+
+> Now the executable starts for real.
+
 ### Explanation of Execution Trace in x64dbg
 
 This section provides a detailed analysis of each recorded event in the debug trace of a handcrafted Windows x64 assembly console application. Each line in the trace is explored as a discrete phase in system startup, bridging low-level loader behavior with practical debugging insights. Intended for systems programmers and reverse engineers, the breakdown clarifies exactly what Windows is doing under the hood when your EXE first breathes.
